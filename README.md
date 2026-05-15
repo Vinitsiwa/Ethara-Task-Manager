@@ -101,7 +101,7 @@ npm run dev
 ## Submission checklist
 
 - [ ] Live Railway URL
-- [ ] GitHub repository link
+- [x] GitHub repository: https://github.com/Vinitsiwa/Ethara-Task-Manager
 - [ ] This README with your deployed URL filled in
 
 ---
