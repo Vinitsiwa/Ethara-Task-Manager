@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+  body {
+    @apply min-h-screen bg-zinc-950 text-zinc-100;
+  }
+  ::selection {
+    @apply bg-accent-500/40 text-white;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-accent-300 via-cyan-400 to-teal-300 bg-clip-text text-transparent;
+  }
+  .surface-grid {
+    background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(16, 185, 129, 0.15), transparent);
+  }
+}
+
+@layer components {
+  .focus-ring {
+    @apply outline-none ring-2 ring-accent-500/60 ring-offset-2 ring-offset-zinc-950;
+  }
+}
