@@ -9,21 +9,18 @@ export const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
 api.interceptors.response.use(
   (res) => res,
   (error: AxiosError) => {
-    const status = error.response?.status;
     const cfg = error.config as InternalAxiosRequestConfig & { _skipAuthRedirect?: boolean };
-    if (status === 401 && cfg?.headers?.Authorization && !cfg._skipAuthRedirect) {
+    if (error.response?.status === 401 && cfg?.headers?.Authorization && !cfg._skipAuthRedirect) {
       localStorage.removeItem("token");
       const path = window.location.pathname;
-      if (!path.startsWith("/login") && !path.startsWith("/register")) {
+      if (!path.startsWith("/login") && !path.startsWith("/signup")) {
         window.location.assign("/login");
       }
     }
@@ -33,11 +30,10 @@ api.interceptors.response.use(
 
 export function getErrorMessage(err: unknown): string {
   if (axios.isAxiosError(err)) {
-    const ax = err as AxiosError<{ detail?: string | { msg: string }[] }>;
-    const d = ax.response?.data?.detail;
+    const d = (err as AxiosError<{ detail?: string | { msg: string }[] }>).response?.data?.detail;
     if (typeof d === "string") return d;
     if (Array.isArray(d)) return d.map((x) => x.msg).join(", ");
-    return ax.message || "Request failed";
+    return err.message || "Request failed";
   }
   if (err instanceof Error) return err.message;
   return "Something went wrong";

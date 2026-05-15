@@ -1,19 +1,3 @@
-from backend.models.models import (
-    TaskPriority,
-    TaskStatus,
-    User,
-    UserRole,
-    WorkItem,
-    Workspace,
-    WorkspaceMember,
-)
+from backend.models.models import Project, ProjectMember, Task, TaskStatus, User, UserRole
 
-__all__ = [
-    "TaskPriority",
-    "TaskStatus",
-    "User",
-    "UserRole",
-    "WorkItem",
-    "Workspace",
-    "WorkspaceMember",
-]
+__all__ = ["Project", "ProjectMember", "Task", "TaskStatus", "User", "UserRole"]

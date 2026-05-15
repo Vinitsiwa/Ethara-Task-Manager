@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import type { ItemPriority } from "@/services/types";
+type ItemPriority = "Low" | "Medium" | "High";
 
 const styles: Record<ItemPriority, string> = {
   Low: "bg-sky-500/15 text-sky-200 ring-sky-500/25",

@@ -3,18 +3,15 @@ import { api, getErrorMessage } from "./api";
 import { queryClient } from "./queryClient";
 import type { User } from "./types";
 
-interface AuthState {
+interface AuthContextValue {
   user: User | null;
+  token: string | null;
   loading: boolean;
   error: string | null;
-}
-
-interface AuthContextValue extends AuthState {
-  token: string | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string, role: User["role"]) => Promise<User>;
+  signup: (name: string, email: string, password: string) => Promise<User>;
   logout: () => void;
-  refreshProfile: () => Promise<void>;
+  refreshMe: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -24,20 +21,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const profileInflight = useRef<Promise<void> | null>(null);
+  const inflight = useRef<Promise<void> | null>(null);
 
-  const refreshProfile = useCallback(async () => {
-    if (profileInflight.current) return profileInflight.current;
+  const refreshMe = useCallback(async () => {
+    if (inflight.current) return inflight.current;
     const p = (async () => {
       const t = localStorage.getItem("token");
       setToken(t);
-      if (!t) {
-        setUser(null);
-        setLoading(false);
-        return;
-      }
+      if (!t) { setUser(null); setLoading(false); return; }
       try {
-        const { data } = await api.get<User>("/api/auth/profile");
+        const { data } = await api.get<User>("/api/auth/me");
         setUser(data);
         setError(null);
       } catch (e) {
@@ -49,28 +42,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setLoading(false);
       }
     })();
-    const tracked = p.finally(() => {
-      profileInflight.current = null;
-    });
-    profileInflight.current = tracked;
+    const tracked = p.finally(() => { inflight.current = null; });
+    inflight.current = tracked;
     return tracked;
   }, []);
 
-  useEffect(() => {
-    void refreshProfile();
-  }, [refreshProfile]);
+  useEffect(() => { void refreshMe(); }, [refreshMe]);
 
   const login = async (email: string, password: string) => {
     setError(null);
     const { data } = await api.post<{ access_token: string }>("/api/auth/login", { email, password });
     localStorage.setItem("token", data.access_token);
     setLoading(true);
-    await refreshProfile();
+    await refreshMe();
   };
 
-  const register = async (name: string, email: string, password: string, role: User["role"]) => {
+  const signup = async (name: string, email: string, password: string) => {
     setError(null);
-    const { data } = await api.post<User>("/api/auth/register", { name, email, password, role });
+    const { data } = await api.post<User>("/api/auth/signup", { name, email, password });
     return data;
   };
 
@@ -82,17 +71,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const value = useMemo(
-    () => ({
-      user,
-      loading,
-      error,
-      token,
-      login,
-      register,
-      logout,
-      refreshProfile,
-    }),
-    [user, loading, error, token, login, register, logout, refreshProfile]
+    () => ({ user, token, loading, error, login, signup, logout, refreshMe }),
+    [user, token, loading, error, refreshMe]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

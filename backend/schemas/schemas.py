@@ -3,129 +3,146 @@ from typing import Optional
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
-from backend.models.models import TaskPriority, TaskStatus, UserRole
+from backend.models.models import TaskStatus, UserRole
 
 
-class UserRegister(BaseModel):
+# ── Auth ──────────────────────────────────────────────────────────────────────
+
+class UserSignup(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     email: EmailStr
     password: str = Field(..., min_length=6, max_length=128)
-    role: UserRole = UserRole.Member
 
     @field_validator("name")
     @classmethod
     def name_not_blank(cls, v: str) -> str:
-        if not v or not v.strip():
+        if not v.strip():
             raise ValueError("Name is required")
         return v.strip()
 
 
-class UserCredentials(BaseModel):
+class UserLogin(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=1)
 
 
-class AuthToken(BaseModel):
+class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
 
 
-class UserResponse(BaseModel):
+class UserOut(BaseModel):
     id: int
     name: str
     email: str
     role: UserRole
-    joined_at: datetime
+    created_at: datetime
 
     model_config = {"from_attributes": True}
 
 
-class WorkspaceCreate(BaseModel):
-    title: str = Field(..., min_length=1, max_length=255)
-    summary: Optional[str] = None
+class ProfileUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=1, max_length=255)
+    email: Optional[EmailStr] = None
+    current_password: Optional[str] = None
+    new_password: Optional[str] = Field(None, min_length=6, max_length=128)
 
-    @field_validator("title")
+
+# ── Projects ──────────────────────────────────────────────────────────────────
+
+class ProjectCreate(BaseModel):
+    name: str = Field(..., min_length=1, max_length=255)
+    description: Optional[str] = None
+
+    @field_validator("name")
     @classmethod
-    def title_strip(cls, v: str) -> str:
-        if not v or not v.strip():
-            raise ValueError("Workspace title is required")
+    def name_strip(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("Project name is required")
         return v.strip()
 
 
-class WorkspaceUpdate(BaseModel):
-    title: Optional[str] = Field(None, min_length=1, max_length=255)
-    summary: Optional[str] = None
+class ProjectUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=1, max_length=255)
+    description: Optional[str] = None
 
 
-class WorkspaceResponse(BaseModel):
+class ProjectOut(BaseModel):
     id: int
-    title: str
-    summary: Optional[str]
-    owner_id: int
+    name: str
+    description: Optional[str]
+    created_by: int
     created_at: datetime
-    updated_at: datetime
 
     model_config = {"from_attributes": True}
 
 
-class CollaboratorResponse(BaseModel):
+class ProjectMemberDetailOut(BaseModel):
     membership_id: int
-    workspace_id: int
+    project_id: int
     user_id: int
     name: str
     email: str
     role: UserRole
 
 
-class WorkItemCreate(BaseModel):
+# ── Tasks ─────────────────────────────────────────────────────────────────────
+
+class TaskCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=255)
-    notes: Optional[str] = None
-    status: TaskStatus = TaskStatus.Pending
-    priority: TaskPriority = TaskPriority.Medium
-    assignee_id: Optional[int] = None
-    workspace_id: int
-    deadline: Optional[datetime] = None
+    description: Optional[str] = None
+    status: TaskStatus = TaskStatus.Todo
+    assigned_to: Optional[int] = None
+    project_id: int
+    due_date: Optional[datetime] = None
 
     @field_validator("title")
     @classmethod
     def title_strip(cls, v: str) -> str:
-        if not v or not v.strip():
+        if not v.strip():
             raise ValueError("Title is required")
         return v.strip()
 
 
-class WorkItemUpdate(BaseModel):
+class TaskUpdate(BaseModel):
     title: Optional[str] = Field(None, min_length=1, max_length=255)
-    notes: Optional[str] = None
+    description: Optional[str] = None
     status: Optional[TaskStatus] = None
-    priority: Optional[TaskPriority] = None
-    assignee_id: Optional[int] = None
-    workspace_id: Optional[int] = None
-    deadline: Optional[datetime] = None
+    assigned_to: Optional[int] = None
+    project_id: Optional[int] = None
+    due_date: Optional[datetime] = None
 
 
-class WorkItemResponse(BaseModel):
+class TaskOut(BaseModel):
     id: int
     title: str
-    notes: Optional[str]
+    description: Optional[str]
     status: TaskStatus
-    priority: TaskPriority
-    assignee_id: Optional[int]
-    workspace_id: int
-    deadline: Optional[datetime]
+    assigned_to: Optional[int]
+    project_id: int
+    due_date: Optional[datetime]
     created_at: datetime
 
     model_config = {"from_attributes": True}
 
 
-class CollaboratorInvite(BaseModel):
+# ── Members ───────────────────────────────────────────────────────────────────
+
+class MemberAdd(BaseModel):
     user_id: int = Field(..., gt=0)
 
 
-class OverviewStats(BaseModel):
-    total_items: int
-    pending_count: int
-    active_count: int
-    done_count: int
+# ── Dashboard ─────────────────────────────────────────────────────────────────
+
+class DashboardOut(BaseModel):
+    total_tasks: int
+    todo_count: int
+    in_progress_count: int
+    completed_count: int
     overdue_count: int
-    high_priority_count: int
+
+
+# ── Users / Role ──────────────────────────────────────────────────────────────
+
+class RoleUpdate(BaseModel):
+    role: UserRole

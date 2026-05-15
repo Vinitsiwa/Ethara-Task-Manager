@@ -4,29 +4,22 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["DM Sans", "system-ui", "sans-serif"],
-        display: ["DM Sans", "system-ui", "sans-serif"],
+        sans: ["Inter", "system-ui", "sans-serif"],
+        display: ["Inter", "system-ui", "sans-serif"],
       },
       colors: {
-        accent: {
-          50: "#ecfdf5",
-          100: "#d1fae5",
-          200: "#a7f3d0",
-          300: "#6ee7b7",
-          400: "#34d399",
-          500: "#10b981",
-          600: "#059669",
-          700: "#047857",
-          800: "#065f46",
-          900: "#064e3b",
+        brand: {
+          50: "#eef2ff", 100: "#e0e7ff", 200: "#c7d2fe",
+          300: "#a5b4fc", 400: "#818cf8", 500: "#6366f1",
+          600: "#4f46e5", 700: "#4338ca", 800: "#3730a3", 900: "#312e81",
         },
       },
       boxShadow: {
-        glow: "0 0 40px -10px rgba(16, 185, 129, 0.35)",
+        glow: "0 0 40px -10px rgba(99, 102, 241, 0.35)",
         panel: "0 4px 24px -4px rgba(0, 0, 0, 0.45)",
       },
       animation: {
-        "fade-in": "fadeIn 0.35s ease-out",
+        "fade-in": "fadeIn 0.2s ease-out",
         shimmer: "shimmer 1.2s ease-in-out infinite",
       },
       keyframes: {

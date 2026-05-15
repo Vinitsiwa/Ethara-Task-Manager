@@ -1,52 +1,46 @@
 export type UserRole = "Admin" | "Member";
-
-export type ItemStatus = "Pending" | "Active" | "Done";
-
-export type ItemPriority = "Low" | "Medium" | "High";
+export type TaskStatus = "Todo" | "In Progress" | "Completed";
 
 export interface User {
   id: number;
   name: string;
   email: string;
   role: UserRole;
-  joined_at: string;
-}
-
-export interface Workspace {
-  id: number;
-  title: string;
-  summary: string | null;
-  owner_id: number;
   created_at: string;
-  updated_at: string;
 }
 
-export interface Collaborator {
+export interface Project {
+  id: number;
+  name: string;
+  description: string | null;
+  created_by: number;
+  created_at: string;
+}
+
+export interface ProjectMemberDetail {
   membership_id: number;
-  workspace_id: number;
+  project_id: number;
   user_id: number;
   name: string;
   email: string;
   role: UserRole;
 }
 
-export interface WorkItem {
+export interface Task {
   id: number;
   title: string;
-  notes: string | null;
-  status: ItemStatus;
-  priority: ItemPriority;
-  assignee_id: number | null;
-  workspace_id: number;
-  deadline: string | null;
+  description: string | null;
+  status: TaskStatus;
+  assigned_to: number | null;
+  project_id: number;
+  due_date: string | null;
   created_at: string;
 }
 
-export interface OverviewStats {
-  total_items: number;
-  pending_count: number;
-  active_count: number;
-  done_count: number;
+export interface Dashboard {
+  total_tasks: number;
+  todo_count: number;
+  in_progress_count: number;
+  completed_count: number;
   overdue_count: number;
-  high_priority_count: number;
 }
