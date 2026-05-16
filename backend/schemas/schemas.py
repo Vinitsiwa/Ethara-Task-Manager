@@ -12,6 +12,7 @@ class UserSignup(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     email: EmailStr
     password: str = Field(..., min_length=6, max_length=128)
+    role: UserRole = UserRole.Member
 
     @field_validator("name")
     @classmethod

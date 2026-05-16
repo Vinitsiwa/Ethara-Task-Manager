@@ -15,15 +15,11 @@ def signup(payload: UserSignup, db: Session = Depends(get_db)):
     if db.query(User).filter(User.email == str(payload.email).lower()).first():
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    # First user ever becomes Admin automatically
-    user_count = db.query(User).count()
-    role = UserRole.Admin if user_count == 0 else UserRole.Member
-
     user = User(
         name=payload.name,
         email=str(payload.email).lower(),
         password=hash_password(payload.password),
-        role=role.value,
+        role=payload.role.value,
     )
     db.add(user)
     db.commit()
